@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     iproute2 \
     mysql-client \
-    netcat \
+    netcat-openbsd \
     net-tools \
     tcpdump \
     telnet \
