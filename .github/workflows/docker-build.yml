@@ -1,0 +1,46 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/Dockerfile'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/Dockerfile'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Obtener carpeta modificada
+        id: changed-directory
+        uses: tj-actions/changed-files@v39
+        with:
+          files: '**/Dockerfile'
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build y Push
+        uses: docker/build-push-action@v4
+        if: steps.changed-directory.outputs.any_changed == 'true'
+        with:
+          context: "."
+          file: ${{ steps.changed-directory.outputs.all_changed_files }}
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.changed-directory.outputs.all_changed_files == './victorinox/Dockerfile' && 'victorinox' || github.event.repository.name }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.changed-directory.outputs.all_changed_files == './victorinox/Dockerfile' && 'victorinox' || github.event.repository.name }}:${{ github.sha }}
