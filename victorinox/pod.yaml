@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: victorinox
+spec:
+  containers:
+    - name: victorinox
+      image: juanviola/victorinox:latest
+
