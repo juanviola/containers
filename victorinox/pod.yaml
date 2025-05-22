@@ -6,4 +6,4 @@ spec:
   containers:
     - name: victorinox
       image: juanviola/victorinox:latest
-      imagepolicy: Always
+      imagePullPolicy: Always
