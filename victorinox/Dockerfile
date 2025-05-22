@@ -24,3 +24,4 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /root
 
 CMD ["tail", "-f", "/dev/null"]
+
