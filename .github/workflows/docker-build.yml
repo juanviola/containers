@@ -34,13 +34,19 @@ jobs:
       - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build y Push
-        uses: docker/build-push-action@v4
-        if: steps.changed-directory.outputs.any_changed == 'true'
-        with:
-          context: "."
-          file: ${{ steps.changed-directory.outputs.all_changed_files }}
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.changed-directory.outputs.all_changed_files == './victorinox/Dockerfile' && 'victorinox' || github.event.repository.name }}:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.changed-directory.outputs.all_changed_files == './victorinox/Dockerfile' && 'victorinox' || github.event.repository.name }}:${{ github.sha }}
+      - name: Set image tags
+        id: vars
+        run: |
+          echo "IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/$(basename $GITHUB_REPOSITORY)" >> $GITHUB_OUTPUT
+          echo "TAG_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image with both tags
+        run: |
+          docker build -t ${{ steps.vars.outputs.IMAGE_NAME }}:${{ steps.vars.outputs.TAG_SHA }} \
+                       -t ${{ steps.vars.outputs.IMAGE_NAME }}:latest -f 'victorinox/Dockerfile' .
+
+      - name: Push both image tags
+        run: |
+          docker push ${{ steps.vars.outputs.IMAGE_NAME }}:${{ steps.vars.outputs.TAG_SHA }}
+          docker push ${{ steps.vars.outputs.IMAGE_NAME }}:latest
+
