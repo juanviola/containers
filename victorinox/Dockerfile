@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     vim \
     htop \
+    nmap \
     jq \
     # clean cache
     && apt-get clean \
