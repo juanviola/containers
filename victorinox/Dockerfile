@@ -30,6 +30,16 @@ RUN apt-get update && apt-get install -y \
     # Actualizamos e instalamos Docker CLI
     && apt-get update \
     && apt-get install -y docker-ce-cli \
+    # Instalamos Node.js desde NodeSource
+    && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs \
+    # Agregamos la clave GPG de MongoDB
+    && curl -fsSL https://pgp.mongodb.com/server-7.0.asc | gpg --dearmor -o /etc/apt/keyrings/mongodb-server-7.0.gpg \
+    # Agregamos el repositorio de MongoDB
+    && echo "deb [ arch=amd64,arm64 signed-by=/etc/apt/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list \
+    # Actualizamos e instalamos mongosh
+    && apt-get update \
+    && apt-get install -y mongodb-mongosh \
     # Limpiamos la caché
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
